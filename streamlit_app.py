@@ -6,9 +6,26 @@ from math import *
 import json 
 import pandas as pd 
 import plotly.express as px
+st.markdown('<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">', unsafe_allow_html=True)
+st.markdown(""" 
+<nav class="navbar navbar-expand-lg navbar-light" style="background-color: #FF4B4B;">
+  <a class="navbar-brand" href="https://github.com/Harimadhavmatta/crypto_coin_app" style="text-decoration: none;">Crypto App</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
 
-
-
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="https://github.com/Harimadhavmatta/">MY Github <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item active">
+        <a class="nav-link" href="https://www.linkedin.com/in/hari-madhav-matta-766b9b272/">Linkedin<span class="sr-only">(current)</span></a>
+      </li>
+    </ul>
+  </div>
+</nav>
+""",unsafe_allow_html=True)
 mongo_user='mattaharimadhav2004'
 mongo_pass='chQNUDwVPr0Ov5jx'
 uri=f"mongodb+srv://{mongo_user}:{mongo_pass}@cluster0.yzrkrnz.mongodb.net/"
@@ -44,12 +61,12 @@ def diff(fetched):
 
 #                                   last updated
 #==========================================================================================
-st.header('recently updated before')
+st.header('Data Updation Status')
 with open("time.json", "r") as f:
     data = json.load(f)
-st.write(f"bitcoin data updated:  {diff(data['bitcoin'])} mins ago")
-st.write(f"ethereum data updated: {diff(data['ethereum'])} mins ago")
-st.write(f"solana data updated:   {diff(data['solana'])} mins ago")
+st.write(f"Bitcoin data updated:  {diff(data['bitcoin'])} mins ago")
+st.write(f"Ethereum data updated: {diff(data['ethereum'])} mins ago")
+st.write(f"Solana data updated:   {diff(data['solana'])} mins ago")
 
 #                             fetch data from mongodb
 #===========================================================================================
@@ -95,12 +112,12 @@ if "current_data_lis" not in st.session_state:
 
 print("current_data_lis",st.session_state.current_data_lis)
 # Compare with previous timestamp
-
+st.subheader('Did i fetch data from mongodb ')
 if len(st.session_state.current_data_lis) == 0:
     st.session_state.current_data_lis = fetch_data_from_mongo()
-    st.write("🔄 we did fetch new data.")
+    st.write("🔄 we did fetch new data from mongodb .")
 else:
-    st.write("✅ You didn't change the date")
+    st.write("✅ This data is from cache . ")
 
 
 #                                      Plots 
@@ -115,6 +132,7 @@ columns = [
 
 # Convert to DataFrame
 df = pd.DataFrame(st.session_state.current_data_lis, columns=columns)
+st.subheader('These are the current stats of three coins . ')
 st.dataframe(df)
 # Display or use the DataFrame
 # print(df)
@@ -129,7 +147,7 @@ y_axis = st.selectbox(
 )
 
 # 📊 Create bar plot
-fig = px.bar(df, x="id", y=y_axis, color="id", title=f"{y_axis} by Coin ID")
+fig = px.bar(df, x="id", y=y_axis, color="id", title=f"{y_axis} v/s Coin ID")
 st.plotly_chart(fig)
 
 #                                   Date Base Analytics 
@@ -138,7 +156,7 @@ st.plotly_chart(fig)
 st.header("Date Base Analytics")
 
 
-d = st.date_input("target date", date(2024, 7, 6))
+d = st.date_input("Target date", date(2024, 7, 6))
 formatted_dat = d.strftime('%d-%m-%Y')
 print(formatted_dat)
 
@@ -203,5 +221,5 @@ y_axis = st.selectbox(
 )
 
 # 📊 Create bar plot
-fig = px.bar(df, x="ID", y=y_axis, color="ID", title=f"{y_axis} by Coin ID on {st.session_state.last_timestamp}")
+fig = px.bar(df, x="ID", y=y_axis, color="ID", title=f"{y_axis} v/s Coin ID on {st.session_state.last_timestamp}")
 st.plotly_chart(fig)
