@@ -26,8 +26,8 @@ st.markdown("""
   </div>
 </nav>
 """,unsafe_allow_html=True)
-mongo_user='mattaharimadhav2004'
-mongo_pass='chQNUDwVPr0Ov5jx'
+mongo_user=st.secrets['mongo_user']
+mongo_pass=st.secrets['mongo_pass']
 uri=f"mongodb+srv://{mongo_user}:{mongo_pass}@cluster0.yzrkrnz.mongodb.net/"
 client=MongoClient(uri)
 
