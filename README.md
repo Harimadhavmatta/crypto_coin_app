@@ -11,7 +11,6 @@
 
 [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://my-crypto-coin-app.streamlit.app/)
 
-Here's a suitable **README.md** content for your Streamlit cryptocurrency dashboard project using MongoDB and the CoinGecko API:
 
 
 # 📊 Crypto Coin Dashboard (Streamlit + MongoDB)
@@ -107,7 +106,4 @@ streamlit run app.py
 * **Hari Madhav Matta**
   [LinkedIn](https://www.linkedin.com/in/hari-madhav-matta-766b9b272/) | [GitHub](https://github.com/Harimadhavmatta/)
 
----
-
-Let me know if you want to add badges, deployment steps (like Streamlit Cloud or Render), or environment variable setup instructions.
 
