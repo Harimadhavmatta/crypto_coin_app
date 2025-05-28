@@ -54,8 +54,13 @@ This Streamlit web app visualizes real-time and historical cryptocurrency data (
 * Compare different metrics (e.g., current price, market cap) across coins or on historical dates
 
 ## 🖥️ Screenshots
+![image](https://github.com/user-attachments/assets/e7c6d5b9-b380-48a5-91a3-57ac1c605bce)
+![image](https://github.com/user-attachments/assets/95fa7afb-37be-455d-aea5-49352ffa7bfa)
+![image](https://github.com/user-attachments/assets/e8575499-ba5b-4b27-b82d-1c98bd6e73dd)
+![image](https://github.com/user-attachments/assets/9ba117b6-8b01-4248-b766-b9cad21acbb8)
 
-(You can add screenshots or gifs here.)
+
+
 
 ## 📂 Folder Structure
 
