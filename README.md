@@ -1,4 +1,4 @@
-# 📦 Streamlit App Starter Kit 
+# 📦 crypto_coin_app 
 ```
 ⬆️ (crypto_coin_app)
 ```
