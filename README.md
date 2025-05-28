@@ -1,7 +1,10 @@
 # 📦 Streamlit App Starter Kit 
 ```
-⬆️ (Replace above with your app's name)
+⬆️ (crypto_coin_app)
 ```
+![Your paragraph text](https://github.com/user-attachments/assets/9494ba33-dcd4-499f-b21d-edf2e6d43b58)
+
+
 
 Description of the app ...
 
