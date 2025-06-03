@@ -6,6 +6,10 @@ from math import *
 import json 
 import pandas as pd 
 import plotly.express as px
+import numpy as np
+import matplotlib.pyplot as plt
+
+
 st.markdown('<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">', unsafe_allow_html=True)
 st.markdown(""" 
 <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #FF4B4B;">
@@ -26,8 +30,8 @@ st.markdown("""
   </div>
 </nav>
 """,unsafe_allow_html=True)
-mongo_user=st.secrets['mongo_user']
-mongo_pass=st.secrets['mongo_pass']
+mongo_user='mattaharimadhav2004'
+mongo_pass='chQNUDwVPr0Ov5jx'
 uri=f"mongodb+srv://{mongo_user}:{mongo_pass}@cluster0.yzrkrnz.mongodb.net/"
 client=MongoClient(uri)
 
@@ -49,9 +53,9 @@ for coin in coins:
     data[coin] = time
     with open("time.json", "w") as f:
         json.dump(data, f, indent=4)
-    print(time)
+    # print(time)
     data = collection[coin].find_one({"fetched_at": time})
-    print(data.get('current_price'))
+    # print(data.get('current_price'))
 
 def diff(fetched):
     timestamp_dt = datetime.fromisoformat(fetched)
@@ -85,7 +89,7 @@ def fetch_data_from_mongo():
     for index,coin in enumerate(coins):
         
         time= collection['recent_fetched_at'].find_one({"name": coin})
-        print(time)
+        # print(time)
         coin_data = collections[coin].find_one({'fetched_at':time['timestamp']})
         current_lis[index]=[
             coin_data["id"],
@@ -101,23 +105,115 @@ def fetch_data_from_mongo():
             coin_data["market_cap_change_24h"],
             coin_data["market_cap_change_percentage_24h"]
         ]
-        print("coin data : ",coin_data)
+        # print("coin data : ",coin_data)
     return current_lis
 
-# Initialize session state
 
-if "current_data_lis" not in st.session_state:
+
+
+
+#                              Fetch Historical Data 
+#===========================================================================================
+
+def historical_data():
+    historical_data_dict={}
+    coins=['bitcoin','ethereum','solana']
+    for coin in coins:
+        docs=list(collection[coin].find().sort('_id', 1))
+        historical_data_dict[coin]=docs
+    return historical_data_dict
+if "historical_data_dict" not in st.session_state:
     #run_on_date_change(new_timestamp)
-    st.session_state.current_data_lis = []
+    st.session_state.historical_data_dict = {}
 
-print("current_data_lis",st.session_state.current_data_lis)
+# print("historical_data_dict",st.session_state.historical_data_dict)
 # Compare with previous timestamp
-st.subheader('Did i fetch data from mongodb ')
-if len(st.session_state.current_data_lis) == 0:
-    st.session_state.current_data_lis = fetch_data_from_mongo()
-    st.write("🔄 we did fetch new data from mongodb .")
+st.subheader('Did i fetch historical data from mongodb ')
+if len(st.session_state.historical_data_dict) == 0:
+    st.session_state.historical_data_dict = historical_data()
+    st.write("🔄 Historical Data Is Refreshed .")
 else:
-    st.write("✅ This data is from cache . ")
+    st.write("✅ Historical Data From Cache Reload to refresh . ")
+
+#                                 Historical Plots 
+#===========================================================================================
+
+st.title("Crypto Data Historical Visualization")
+
+
+crypto_coin = st.selectbox(
+    "Select coin",
+    [
+        'bitcoin',
+        'ethereum',
+        'solana'
+    ]
+)
+
+y_axis=st.selectbox(
+    "Select Y-axis",
+    [
+        'current_price','market_cap','market_cap_rank','fully_diluted_valuation','total_volume',
+        'high_24h','low_24h','price_change_24h','price_change_percentage_24h','market_cap_change_24h',
+        'market_cap_change_percentage_24h','circulating_supply','total_supply','max_supply','ath',
+        'ath_change_percentage','ath_date','atl','atl_change_percentage','atl_date','roi'
+    ]
+)
+
+
+
+
+
+
+data_lis=st.session_state.historical_data_dict[crypto_coin]
+df = pd.DataFrame(data_lis)
+# st.dataframe(df)
+
+# Field classifications
+line_fields = [
+    'current_price', 'market_cap', 'market_cap_rank', 'fully_diluted_valuation',
+    'total_volume', 'circulating_supply', 'total_supply', 'max_supply', 'ath',
+    'ath_change_percentage', 'ath_date', 'atl', 'atl_change_percentage',
+    'atl_date', 'roi'
+]
+
+bar_fields = [
+    'high_24h', 'low_24h', 'price_change_24h', 'price_change_percentage_24h',
+    'market_cap_change_24h', 'market_cap_change_percentage_24h'
+]
+
+
+
+
+df = df.iloc[20:].reset_index(drop=True)
+
+
+df['fetched_at'] = pd.to_datetime(df['fetched_at'], errors='coerce', utc=True)
+
+
+x = df['fetched_at'].values
+
+y=df[y_axis]
+# Plot
+fig, ax = plt.subplots(figsize=(12, 6))
+if y_axis in line_fields:
+    ax.plot(x, y, marker='o', linestyle='-')
+else:
+    ax.bar(x, y, color='skyblue')
+
+# Formatting
+# Beautify label for display
+formatted_label = y_axis.replace("_", " ").title()
+
+ax.set_xlabel("Date")
+ax.set_ylabel(formatted_label)
+ax.set_title(f"{formatted_label} vs Date")
+plt.xticks(rotation=45)
+plt.tight_layout()
+
+# Display in Streamlit
+st.pyplot(fig)
+
 
 
 #                                      Plots 
@@ -129,6 +225,21 @@ columns = [
     "price_change_24h", "price_change_percentage_24h",
     "market_cap_change_24h", "market_cap_change_percentage_24h"
 ]
+
+# Initialize session state
+
+if "current_data_lis" not in st.session_state:
+    #run_on_date_change(new_timestamp)
+    st.session_state.current_data_lis = []
+
+# print("current_data_lis",st.session_state.current_data_lis)
+# Compare with previous timestamp
+st.subheader('Did i fetch current data from mongodb ')
+if len(st.session_state.current_data_lis) == 0:
+    st.session_state.current_data_lis = fetch_data_from_mongo()
+    st.write("🔄 we did fetch new data from mongodb .")
+else:
+    st.write("✅ This data is from cache . ")
 
 # Convert to DataFrame
 df = pd.DataFrame(st.session_state.current_data_lis, columns=columns)
@@ -158,7 +269,7 @@ st.header("Date Base Analytics")
 
 d = st.date_input("Target date", date(2024, 7, 6))
 formatted_dat = d.strftime('%d-%m-%Y')
-print(formatted_dat)
+# print(formatted_dat)
 
 def run_on_date_change(dat=formatted_dat):
     op={}
@@ -167,7 +278,7 @@ def run_on_date_change(dat=formatted_dat):
         lis=[]
         data_on_specific_date_url=f"https://api.coingecko.com/api/v3/coins/{coin}/history"
         params = {
-            'date': formatted_dat,           # Required format: dd-mm-yyyy
+            'date': formatted_dat,          
             'localization': 'false'      
         }
         headers = {
@@ -175,7 +286,7 @@ def run_on_date_change(dat=formatted_dat):
             "x-cg-demo-api-key": "CG-2evxkAj6hSZcfSsh82U1bV6S" 
         }
         response = requests.get(data_on_specific_date_url,headers=headers, params=params)
-        print(response)
+        # print(response)
         data = response.json()
         id = data.get('id', 'n/a')
         name = data.get('name', 'n/a')
@@ -196,8 +307,8 @@ new_timestamp = formatted_dat
 if "last_timestamp" not in st.session_state:
     #run_on_date_change(new_timestamp)
     st.session_state.last_timestamp = None
-print('new_timestamp : ',new_timestamp)
-print("last_timestamp",st.session_state.last_timestamp)
+# print('new_timestamp : ',new_timestamp)
+# print("last_timestamp",st.session_state.last_timestamp)
 # Compare with previous timestamp
 if "date_based_dict" not in st.session_state:
     st.session_state.date_based_dict = {}
@@ -213,8 +324,7 @@ else:
 columns = ["ID", "Name", "Current Price", "Market Cap", "Total Volume"]
 df = pd.DataFrame.from_dict(st.session_state.date_based_dict, orient='index', columns=columns)
 
-st.subheader(f"📅 Data for {formatted_dat}")
-st.table(df)
+
 y_axis = st.selectbox(
     "Select metric for Y-axis",
     ["Current Price", "Market Cap", "Total Volume"]
